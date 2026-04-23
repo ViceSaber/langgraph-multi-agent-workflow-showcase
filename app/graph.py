@@ -67,17 +67,19 @@ def build_graph():
         "error_handler": "error_handler",
     })
 
-    # reviewer -> human_approval (pass) or worker (revision) or human_approval (limit reached)
+    # reviewer -> human_approval (pass) or worker (revision) or error_handler (error)
     graph.add_conditional_edges("reviewer", route_after_reviewer, {
         "human_approval": "human_approval",
         "worker": "worker",
+        "error_handler": "error_handler",
     })
 
-    # human_approval -> finalize (approve) or supervisor (reject, re-plan)
+    # human_approval -> finalize (approve) or supervisor (reject, re-plan) or error_handler
     graph.add_conditional_edges("human_approval", route_after_human_approval, {
         "finalize": "finalize",
         "supervisor": "supervisor",
         "END": END,
+        "error_handler": "error_handler",
     })
 
     # error_handler -> supervisor (recoverable) or END (non-recoverable)

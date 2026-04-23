@@ -67,23 +67,26 @@ def route_after_reviewer(state: dict) -> str:
 def route_after_human_approval(state: dict) -> str:
     """Determine the next node after human approval/rejection.
 
+    - error_info present -> error_handler
     - APPROVED -> finalize
-    - REJECTED -> supervisor (re-plan with rejection reason)
+    - REJECTED + under limit -> supervisor (re-plan with rejection reason)
+    - REJECTED + over limit -> END
     """
-    status = state.get("status", "")
+    if state.get("error_info"):
+        logger.info("Routing human_approval -> error_handler (error detected)")
+        return "error_handler"
 
-    if status == "FAILED":
-        logger.info("Routing human_approval -> END (rejection limit reached)")
-        return "END"
+    status = state.get("status", "")
 
     if status == "APPROVED":
         logger.info("Routing human_approval -> finalize (approved)")
         return "finalize"
-    elif status == "REJECTED":
-        logger.info("Routing human_approval -> supervisor (rejected, re-planning)")
+
+    if status == "REJECTED":
         if state.get("revision_count", 0) >= state.get("max_revisions", 3):
             logger.info("Routing human_approval -> END (revision guardrail reached)")
             return "END"
+        logger.info("Routing human_approval -> supervisor (rejected, re-planning)")
         return "supervisor"
 
     logger.warning("Unexpected status after human_approval: %s", status)
@@ -101,9 +104,12 @@ def route_after_error_handler(state: dict) -> str:
     if status == "FAILED":
         logger.info("Routing error_handler -> END (non-recoverable)")
         return "END"
-    else:
+    elif status == "RECEIVED":
         logger.info("Routing error_handler -> supervisor (recoverable)")
         return "supervisor"
+    else:
+        logger.warning("Unexpected status after error_handler: %s", status)
+        return "END"
 
 
 def route_after_finalize(state: dict) -> str:
