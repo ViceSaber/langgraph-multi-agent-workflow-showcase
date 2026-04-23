@@ -1,0 +1,11 @@
+Generate a quick reference cheat sheet for common Git commands organized by workflow stage.
+
+Include:
+- Setup & init (3 commands)
+- Daily workflow (5 commands)
+- Branching & merging (4 commands)
+- Undoing mistakes (3 commands)
+
+Each entry should have the command, a one-line description, and a common flag or option.
+Format as a markdown table.
+Keep it under 200 words.

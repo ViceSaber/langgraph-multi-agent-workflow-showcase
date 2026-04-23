@@ -1,0 +1,3 @@
+Create a concise rollout plan for launching an internal AI writing assistant.
+Include goals, a phased timeline, risks, and success metrics.
+

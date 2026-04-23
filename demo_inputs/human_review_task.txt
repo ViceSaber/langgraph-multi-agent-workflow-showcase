@@ -1,0 +1,3 @@
+Prepare a stakeholder update for a search relevance improvement project.
+The response should balance technical detail with executive readability and end with next-step decisions.
+
