@@ -1,0 +1,3 @@
+Generate a weekly status report for a fund company's CRM channel-module migration project.
+Cover: this week's progress (channel module DDL design completed), risk items (2 fields with abnormal fill rates need business confirmation), and next week's plan (start Java Service skeleton design).
+Output as Markdown, suitable for sending to the project manager.

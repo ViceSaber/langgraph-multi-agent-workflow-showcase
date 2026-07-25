@@ -15,38 +15,30 @@ This repository is intentionally narrow. It does not try to be a general multi-a
 
 ## Architecture
 
-```text
-User Request
-   |
-   v
-Supervisor <----------------------------+
-   |                                    |
-   v                                    |
-Worker ---- failure ----> Error Handler |
-   |                                    |
-   v                                    |
-Reviewer ---- fail ----> Worker         |
-   |                                    |
-   +---- fail + limit ---> Human Approval
-   |                          |
-   +--------- pass ---------->|
-                              |
-                     reject --+--> Supervisor
-                              |
-                         approve
-                              |
-                              v
-                           Finalize
-                              |
-                              v
-                             END
+```mermaid
+flowchart TD
+    Start([User Request]) --> Supervisor
+    Supervisor -->|plan| Worker
+    Worker -->|draft| Reviewer
+    Worker -.->|error| ErrorHandler
+    Reviewer -->|pass| HumanApproval
+    Reviewer -->|fail, budget remaining| Worker
+    Reviewer -->|fail, budget exhausted| HumanApproval
+    Reviewer -.->|error| ErrorHandler
+    HumanApproval -->|approve| Finalize
+    HumanApproval -->|reject, budget remaining| Supervisor
+    HumanApproval -->|reject, budget exhausted| End([END])
+    HumanApproval -.->|error| ErrorHandler
+    ErrorHandler -->|recoverable| Supervisor
+    ErrorHandler -->|non-recoverable| End
+    Finalize --> End
 ```
 
-More detail is in [docs/architecture.md](/Users/sakura/projects/langgraph-multi-agent-workflow-showcase/docs/architecture.md) and [docs/state_machine.md](/Users/sakura/projects/langgraph-multi-agent-workflow-showcase/docs/state_machine.md).
+More detail is in [docs/architecture.md](docs/architecture.md) and [docs/state_machine.md](docs/state_machine.md).
 
 ## State Schema
 
-The workflow uses one core state object in [app/state.py](/Users/sakura/projects/langgraph-multi-agent-workflow-showcase/app/state.py):
+The workflow uses one core state object in [app/state.py](app/state.py):
 
 - `task_id`
 - `user_request`
@@ -76,7 +68,10 @@ langgraph-multi-agent-workflow-showcase/
 |-- demo_inputs/
 |   |-- normal_task.txt
 |   |-- revision_task.txt
-|   `-- human_review_task.txt
+|   |-- human_review_task.txt
+|   |-- error_recovery_task.txt
+|   |-- financial_report_task.txt
+|   `-- compliance_review_task.txt
 |-- app/
 |   |-- graph.py
 |   |-- state.py
@@ -135,6 +130,13 @@ python3 main.py --input demo_inputs/revision_task.txt
 python3 main.py --input demo_inputs/human_review_task.txt
 ```
 
+Domain-specific demos (financial services scenarios):
+
+```bash
+python3 main.py --input demo_inputs/financial_report_task.txt
+python3 main.py --input demo_inputs/compliance_review_task.txt
+```
+
 Resume a checkpointed run:
 
 ```bash
@@ -168,7 +170,7 @@ The docs include four representative runs:
 3. human reject then re-plan
 4. worker error then error recovery
 
-See [docs/sample_run.md](/Users/sakura/projects/langgraph-multi-agent-workflow-showcase/docs/sample_run.md).
+See [docs/sample_run.md](docs/sample_run.md).
 
 ## What This Demonstrates
 

@@ -1,0 +1,4 @@
+Review a risk-control rule change proposal for a bank's anti-fraud system.
+The proposal wants to tighten transaction monitoring thresholds for high-risk accounts.
+Produce a structured review covering: completeness of the rule logic, regulatory compliance risks, false-positive impact on customers, and an actionable approval/rejection recommendation.
+Output as Markdown with explicit section headings.
